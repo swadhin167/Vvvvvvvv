@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoinReel — Watch. Earn. Repeat.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#FFFFFF;
+    --surface:#F4F3F7;
+    --surface-hi:#ECEAF2;
+    --stroke:#E3E1EA;
+    --gold:#C9820F;
+    --coral:#FF6F59;
+    --text-hi:#1B1032;
+    --text-mid:#5B5470;
+    --text-low:#938B9E;
+    --radius-lg:22px;
+    --radius-md:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0; height:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:radial-gradient(circle at 20% 0%, #FBFAFD 0%, #F3F1F8 55%, #EDEBF3 100%);
+    overflow:hidden;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .display{font-family:'Baloo 2',sans-serif;}
+
+  .app-shell{
+    width:100vw; height:100vh; height:100dvh;
+    background:var(--bg-deep);
+    display:flex; flex-direction:column;
+    position:relative; overflow:hidden;
+  }
+
+  header{
+    padding:12px 20px 10px;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-shrink:0; border-bottom:1px solid var(--stroke);
+  }
+  .brand{display:flex; align-items:center; gap:6px;}
+  .brand-mark{
+    width:28px;height:28px;border-radius:9px;
+    background:conic-gradient(from 220deg, var(--coral), var(--gold), var(--coral));
+    display:flex;align-items:center;justify-content:center; font-size:15px;
+  }
+  .brand-name{font-family:'Baloo 2';font-weight:700;font-size:16px;color:var(--text-hi);}
+  .demo-pill{
+    font-size:8px; font-weight:700; letter-spacing:.6px;
+    color:var(--coral); background:rgba(255,111,89,.14);
+    border:1px solid rgba(255,111,89,.35);
+    padding:1px 5px; border-radius:20px; margin-left:5px;
+  }
+  .header-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;}
+  .search-row{
+    display:flex; align-items:center; gap:3px;
+    background:var(--surface); border:1px solid var(--stroke);
+    border-radius:7px; padding:2px 6px; max-width:220px;
+  }
+  .search-icon{width:10px;height:10px; stroke:var(--text-low); flex-shrink:0;}
+  .search-input{
+    flex:1; background:none; border:none; outline:none;
+    color:var(--text-hi); font-family:'Inter'; font-size:9.5px; min-width:0;
+  }
+  .search-input::placeholder{color:var(--text-low);}
+  .header-icons-row{display:flex; gap:6px; margin-top:6px;}
+  .header-icon-btn{
+    width:32px; height:32px; border-radius:9px; flex-shrink:0;
+    background:var(--surface); border:1px solid var(--stroke);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .header-icon-btn svg{width:15px;height:15px; stroke:var(--text-mid);}
+  .header-icon-btn:active{transform:scale(.92);}
+  .category-tabs{
+    display:flex; gap:20px; overflow-x:auto; scrollbar-width:none;
+    padding:12px 20px 10px; border-bottom:1px solid var(--stroke); flex-shrink:0;
+  }
+  .category-tabs::-webkit-scrollbar{display:none;}
+  .cat-tab{
+    flex-shrink:0; background:none; border:none; cursor:pointer;
+    font-family:'Inter'; font-weight:600; font-size:13px; color:var(--text-low);
+    padding:0 0 10px; position:relative; white-space:nowrap;
+  }
+  .cat-tab.active{color:var(--text-hi);}
+  .cat-tab.active::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:2.5px;
+    background:var(--coral); border-radius:2px;
+  }
+  .no-results{text-align:center; padding:50px 16px; color:var(--text-mid);}
+  .no-results-icon{font-size:34px; margin-bottom:10px;}
+  .quick-grid{display:flex; gap:10px; overflow-x:auto; padding:12px 0 6px; scrollbar-width:none;}
+  .quick-grid::-webkit-scrollbar{display:none;}
+  .quick-item{
+    flex-shrink:0; width:64px; display:flex; flex-direction:column; align-items:center; gap:6px;
+    cursor:pointer; background:none; border:none;
+  }
+  .quick-icon{
+    width:52px; height:52px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    background:var(--surface); border:1px solid var(--stroke);
+  }
+  .quick-label{font-size:10px; color:var(--text-mid); font-weight:600; text-align:center; line-height:1.2;}
+  .video-avatar-row{display:flex; align-items:center; gap:8px; margin-top:6px;}
+  .video-avatar{
+    width:26px;height:26px;border-radius:50%; flex-shrink:0;
+    background:conic-gradient(from 90deg, var(--coral), var(--gold), #7C5CFF, var(--coral));
+  }
+  .wallet-chip{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--stroke);
+    padding:7px 14px 7px 10px; border-radius:20px; cursor:pointer;
+  }
+  .wallet-chip:active{transform:scale(.95);}
+  .wallet-chip .coin-balance{font-family:'JetBrains Mono';font-weight:700;color:var(--gold);font-size:14px;}
+
+  .tabs{flex:1; overflow-y:auto; padding:6px 0 16px; min-height:0;}
+  .tab-inner{max-width:640px; margin:0 auto; padding:0 20px;}
+  .tab-section{display:none; animation:fadeIn .35s ease;}
+  .tab-section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .section-title{font-family:'Baloo 2'; font-weight:700; font-size:21px; color:var(--text-hi); margin:16px 0 4px;}
+  .section-sub{font-size:12.5px; color:var(--text-low); margin-bottom:18px;}
+
+  .video-card{
+    background:transparent;
+    border-bottom:8px solid var(--stroke);
+    margin:0 -20px 0; overflow:hidden;
+  }
+  .video-frame-wrap{position:relative; width:100%; padding-top:56.25%; background:#000;}
+  .video-frame-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .duration-badge{
+    position:absolute; right:8px; bottom:8px; z-index:2; pointer-events:none;
+    background:rgba(0,0,0,.65); color:#fff; font-size:10.5px; font-family:'JetBrains Mono';
+    padding:2px 6px; border-radius:6px;
+  }
+  .video-meta{padding:12px 20px 16px;}
+  .video-title{font-weight:600; font-size:15px; color:var(--text-hi); margin:0 0 3px;}
+  .video-sub{font-size:11.5px; color:var(--text-low); margin:0;}
+
+  /* Ad container - important */
+  .video-ad-wrap{
+    margin: 14px 0 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50px;
+    width: 100%;
+    overflow: hidden;
+    background: #f8f7fa;
+    border-radius: 8px;
+  }
+  .video-ad-wrap iframe{
+    max-width: 100% !important;
+  }
+
+  .btn{
+    border:none; cursor:pointer; font-family:'Inter'; font-weight:600;
+    border-radius:11px; padding:9px 14px; font-size:12.5px;
+    display:flex;align-items:center;gap:6px; justify-content:center;
+    transition:opacity .15s ease, transform .1s ease; text-decoration:none;
+  }
+  .btn:active{transform:scale(.96);}
+
+  .earn-card{background:var(--surface); border:1px solid var(--stroke); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; box-shadow:0 1px 3px rgba(27,16,50,.05);}
+  .earn-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .earn-title{font-weight:700; font-size:14.5px; color:var(--text-hi);}
+  .earn-reward{font-family:'JetBrains Mono'; font-size:12px; color:var(--gold); font-weight:700;}
+
+  .streak-row{display:flex; gap:6px; margin-bottom:14px;}
+  .streak-dot{flex:1; height:34px; border-radius:9px; background:rgba(255,255,255,.05); border:1px solid var(--stroke); display:flex;align-items:center;justify-content:center; font-size:11px; color:var(--text-low); font-family:'JetBrains Mono';}
+  .streak-dot.filled{background:rgba(201,130,15,.14); border-color:var(--gold); color:var(--gold);}
+  .streak-dot.today{outline:2px solid var(--coral); outline-offset:1px;}
+
+  .wheel-wrap{display:flex; flex-direction:column; align-items:center; padding:6px 0 4px;}
+  .wheel-pointer{width:0;height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:14px solid var(--coral); margin-bottom:-4px; z-index:2;}
+  .wheel{
+    width:180px; height:180px; border-radius:50%;
+    background: conic-gradient(#FF6F59 0deg 45deg, #F2B33D 45deg 90deg, #7C5CFF 90deg 135deg, #FF6F59 135deg 180deg, #F2B33D 180deg 225deg, #7C5CFF 225deg 270deg, #FF6F59 270deg 315deg, #F2B33D 315deg 360deg);
+    position:relative; border:4px solid var(--surface); box-shadow:0 0 0 2px var(--stroke);
+    transition:transform 3.2s cubic-bezier(.17,.67,.16,1);
+  }
+  .wheel-center{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:38px; height:38px; border-radius:50%; background:var(--bg-deep); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .spin-btn-wrap{margin-top:14px; width:100%;}
+
+  .ad-timer{font-family:'JetBrains Mono'; font-size:28px; font-weight:700; color:var(--gold); text-align:center; margin:6px 0 12px;}
+  .ad-bar{height:6px; border-radius:4px; background:rgba(255,255,255,.08); overflow:hidden; margin-bottom:14px;}
+  .ad-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--coral),var(--gold)); transition:width .3s linear;}
+
+  .refer-code{display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,.05); border:1px dashed var(--stroke); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:12px;}
+  .refer-code .code{font-family:'JetBrains Mono'; font-weight:700; letter-spacing:1.5px; color:var(--text-hi); font-size:15px;}
+  .btn-copy{background:var(--surface); border:1px solid var(--stroke); color:var(--text-hi); padding:7px 12px;}
+
+  .btn-primary{background:var(--gold); color:#3A2705; width:100%;}
+  .btn-primary:disabled{background:var(--surface); color:var(--text-low); border:1px solid var(--stroke);}
+
+  .balance-card{background:linear-gradient(135deg,#FFF3DD,#F4E4C8); border:1px solid var(--stroke); border-radius:var(--radius-lg); padding:22px 20px; margin-bottom:18px;}
+  .balance-label{font-size:11.5px; color:var(--text-low); margin-bottom:4px; display:flex; align-items:center; gap:6px;}
+  .balance-num{font-family:'JetBrains Mono'; font-size:36px; font-weight:700; color:var(--gold);}
+  .redeem-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:12px;}
+  .redeem-card{background:var(--surface); border:1px solid var(--stroke); border-radius:var(--radius-md); padding:14px 12px; text-align:center; cursor:pointer; box-shadow:0 1px 3px rgba(27,16,50,.05);}
+  .redeem-card:active{transform:scale(.97);}
+  .redeem-icon{font-size:24px; margin-bottom:6px;}
+  .redeem-name{font-size:12px; font-weight:600; color:var(--text-hi); margin-bottom:4px; min-height:30px;}
+  .redeem-cost{font-family:'JetBrains Mono'; font-size:12px; color:var(--gold); font-weight:700;}
+
+  .profile-head{display:flex; flex-direction:column; align-items:center; padding:18px 0 10px;}
+  .avatar{width:74px;height:74px;border-radius:50%; background:conic-gradient(from 180deg, var(--coral), var(--gold), #7C5CFF, var(--coral)); margin-bottom:10px;}
+  .profile-name{font-family:'Baloo 2'; font-weight:700; font-size:18px; color:var(--text-hi);}
+  .profile-sub{font-size:12px; color:var(--text-low); margin-top:2px;}
+  .info-card{background:var(--surface); border:1px solid var(--stroke); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(27,16,50,.05);}
+  .info-title{font-weight:700; font-size:13px; color:var(--text-hi); margin-bottom:6px;}
+  .info-body{font-size:12px; line-height:1.55; color:var(--text-mid);}
+
+  nav{
+    flex-shrink:0; display:flex; justify-content:center;
+    background:rgba(255,255,255,.92); backdrop-filter:blur(10px);
+    border-top:1px solid var(--stroke);
+    padding:10px 6px calc(env(safe-area-inset-bottom,0px) + 10px);
+  }
+  .nav-inner{display:flex; width:100%; max-width:640px;}
+  .nav-btn{flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--text-low); font-family:'Inter'; font-size:10px; font-weight:600; padding:4px 0;}
+  .nav-emoji{font-size:20px; filter:grayscale(65%) opacity(.7); transition:filter .2s, transform .2s;}
+  .nav-btn.active{color:var(--gold);}
+  .nav-btn.active .nav-emoji{filter:none; transform:scale(1.12);}
+
+  .toast{position:fixed; left:50%; bottom:96px; transform:translate(-50%,20px); background:#1B1032; color:#F5F1FF; font-weight:600; font-size:12.5px; padding:10px 18px; border-radius:24px; opacity:0; pointer-events:none; transition:all .3s ease; z-index:80; white-space:nowrap; box-shadow:0 10px 24px rgba(0,0,0,.2);}
+  .toast.show{opacity:1; transform:translate(-50%,0);}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(27,16,50,.45); backdrop-filter:blur(2px); display:none; align-items:center; justify-content:center; z-index:90; padding:30px;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--surface); border:1px solid var(--stroke); border-radius:var(--radius-lg); padding:24px 20px; text-align:center; width:100%; max-width:340px;}
+  .modal-icon{font-size:34px; margin-bottom:8px;}
+  .modal-title{font-family:'Baloo 2'; font-weight:700; font-size:17px; color:var(--text-hi); margin-bottom:6px;}
+  .modal-body{font-size:12.5px; color:var(--text-mid); line-height:1.5; margin-bottom:16px;}
+
+  .coin-fly{position:fixed; font-family:'JetBrains Mono'; font-weight:700; color:var(--gold); font-size:14px; z-index:100; pointer-events:none; transition:transform 1s cubic-bezier(.2,.7,.3,1), opacity 1s ease;}
+
+  @media (prefers-reduced-motion: reduce){
+    .tab-section, .coin-fly, .wheel { transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell" id="appShell">
+
+  <header>
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-mark">🎬</div>
+        <div>
+          <span class="brand-name">CoinReel</span><span class="demo-pill">DEMO</span>
+        </div>
+      </div>
+      <div class="wallet-chip" id="walletChip" onclick="showTab('wallet')">
+        <span>🪙</span><span class="coin-balance" id="coinBalance">0</span>
+      </div>
+    </div>
+    <div class="search-row">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" class="search-input" type="text" placeholder="Search videos..." oninput="filterVideos()">
+    </div>
+    <div class="header-icons-row">
+      <button class="header-icon-btn" onclick="document.querySelector('.quick-grid').scrollIntoView({behavior:'smooth'})" title="Quick actions">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      </button>
+      <button class="header-icon-btn" onclick="showToast('This demo plays videos right here — no files are downloaded')" title="Downloads">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="category-tabs" id="categoryTabs">
+    <button class="cat-tab active" data-cat="featured" onclick="selectCategory('featured', event)">Featured</button>
+    <button class="cat-tab" data-cat="music" onclick="selectCategory('music', event)">Music</button>
+    <button class="cat-tab" data-cat="shorts" onclick="selectCategory('shorts', event)">Shorts</button>
+    <button class="cat-tab" data-cat="subs" onclick="selectCategory('subs', event)">Subscriptions</button>
+    <button class="cat-tab" data-cat="trending" onclick="selectCategory('trending', event)">Trending</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-inner">
+
+      <section class="tab-section active" id="tab-home">
+        <div class="quick-grid">
+          <button class="quick-item" onclick="showTab('earn')">
+            <div class="quick-icon">🎡</div><span class="quick-label">Spin &amp; Win</span>
+          </button>
+          <button class="quick-item" onclick="showTab('earn')">
+            <div class="quick-icon">🎬</div><span class="quick-label">Watch &amp; Earn</span>
+          </button>
+          <button class="quick-item" onclick="showTab('invite')">
+            <div class="quick-icon">🙏</div><span class="quick-label">Refer &amp; Earn</span>
+          </button>
+          <button class="quick-item" onclick="showTab('wallet')">
+            <div class="quick-icon">🎁</div><span class="quick-label">Rewards</span>
+          </button>
+          <button class="quick-item" onclick="showTab('earn')">
+            <div class="quick-icon">📅</div><span class="quick-label">Check-in</span>
+          </button>
+        </div>
+        <div class="section-title">For You</div>
+        <div class="section-sub">Real videos · scroll for more · ads under each video</div>
+        <div id="videoList"></div>
+        <div id="feedSentinel" style="height:1px;"></div>
+      </section>
+
+      <section class="tab-section" id="tab-earn">
+        <div class="section-title">Earn Coins</div>
+        <div class="section-sub">Fictional in-app currency — not redeemable for real cash</div>
+
+        <div class="earn-card">
+          <div class="earn-head"><span class="earn-title">Daily Check-in</span><span class="earn-reward">+15 🪙</span></div>
+          <div class="streak-row" id="streakRow"></div>
+          <button class="btn btn-primary" id="checkinBtn" onclick="claimCheckin(event)">Claim today's coins</button>
+        </div>
+
+        <div class="earn-card">
+          <div class="earn-head"><span class="earn-title">Spin &amp; Win</span><span class="earn-reward">up to +50 🪙</span></div>
+          <div class="wheel-wrap">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel"><div class="wheel-center">🎡</div></div>
+          </div>
+          <div class="spin-btn-wrap"><button class="btn btn-primary" id="spinBtn" onclick="spinWheel(event)">Spin the wheel</button></div>
+        </div>
+
+        <div class="earn-card">
+          <div class="earn-head"><span class="earn-title">Watch &amp; Earn</span><span class="earn-reward">+8 🪙</span></div>
+          <div class="ad-timer" id="adTimer">15s</div>
+          <div class="ad-bar"><div class="ad-bar-fill" id="adBarFill"></div></div>
+          <button class="btn btn-primary" id="adBtn" onclick="startAdWatch(event)">Watch demo ad</button>
+        </div>
+      </section>
+
+      <section class="tab-section" id="tab-invite">
+        <div class="section-title">Invite Friends</div>
+        <div class="section-sub">Fictional in-app currency — not redeemable for real cash</div>
+        <div class="earn-card">
+          <div class="earn-head"><span class="earn-title">Refer a Friend</span><span class="earn-reward">+30 🪙 / friend</span></div>
+          <div class="refer-code">
+            <span class="code" id="referCode">—</span>
+            <button class="btn btn-copy" onclick="copyReferral()">Copy</button>
+          </div>
+          <div class="section-sub" style="margin-bottom:0;">Friends joined: <b id="friendCount" class="mono" style="color:var(--text-hi);">0</b></div>
+        </div>
+      </section>
+
+      <section class="tab-section" id="tab-wallet">
+        <div class="section-title">Wallet</div>
+        <div class="section-sub">Demo rewards store — no real transactions occur</div>
+        <div class="balance-card">
+          <div class="balance-label">🪙 Coin balance</div>
+          <div class="balance-num" id="walletBalance">0</div>
+        </div>
+        <div class="redeem-grid" id="redeemGrid"></div>
+      </section>
+
+      <section class="tab-section" id="tab-profile">
+        <div class="profile-head">
+          <div class="avatar"></div>
+          <div class="profile-name">Demo User</div>
+          <div class="profile-sub">Member since Jul 2026</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">About this app</div>
+          <div class="info-body">CoinReel plays real, publicly available videos right here — nothing is downloaded. Coin balances are simulated.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">Version</div>
+          <div class="info-body">CoinReel Demo · v1.5</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-inner">
+      <button class="nav-btn active" data-tab="home" onclick="showTab('home')">
+        <span class="nav-emoji">🏠</span> Home
+      </button>
+      <button class="nav-btn" data-tab="earn" onclick="showTab('earn')">
+        <span class="nav-emoji">💰</span> Earn
+      </button>
+      <button class="nav-btn" data-tab="invite" onclick="showTab('invite')">
+        <span class="nav-emoji">🙏</span> Invite
+      </button>
+      <button class="nav-btn" data-tab="wallet" onclick="showTab('wallet')">
+        <span class="nav-emoji">🎁</span> Rewards
+      </button>
+      <button class="nav-btn" data-tab="profile" onclick="showTab('profile')">
+        <span class="nav-emoji">👤</span> Me
+      </button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <div class="modal-icon" id="modalIcon">🎉</div>
+      <div class="modal-title" id="modalTitle">Redeemed!</div>
+      <div class="modal-body" id="modalBody">This is a demo redemption — no real transaction has taken place.</div>
+      <button class="btn btn-primary" style="width:auto;padding:9px 24px;" onclick="closeModal()">Okay</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const state = {
+  coins: 120,
+  streak: [true, true, false, false, false, false, false],
+  checkedInToday: false,
+  friendsReferred: 2,
+  referralCode: makeCode(),
+  adRunning: false,
+  spinning: false
+};
+
+const videoPool = [
+  {id:"__g1eDqa6l0", title:"Rakesh Mishra Latest Bhojpuri Official Song 2024 - KAMAR HILELA | कमर हिलेला | Shilpi Raj", channel:"Rakesh Mishra & Shilpi Raj", dur:"3:30"},
+  {id:"Z7rb-nmKD7c", title:"3 Sau 🔥 Golu Gold & Neha Raj | Priyanka Maharaj | New Bhojpuri Hit Song 2024", channel:"Golu Gold & Neha Raj", dur:"3:45"},
+  {id:"B_Y2Ya4e9PY", title:"Balamuwa Ke Ballam ( Latest Bhojpuri Song 2024 ) Samar Singh", channel:"Samar Singh", dur:"3:20"},
+  {id:"CuFQNvVuWb4", title:"#Video | मारs तीया लाइन | #Khesari Lal Yadav | Mara Tiya Line | #Shilpi Raj | Bhojpuri New Song 2024", channel:"Khesari Lal Yadav", dur:"3:15"},
+  {id:"QeR2Sk8Esgk", title:"Power Star Pawan Singh - Ghaghari Official Bhojpuri Song 2025 Ft. Shweta Sharma | T-Series", channel:"Pawan Singh", dur:"3:40"},
+  {id:"mOu_zBiFi5U", title:"#Video - काला ओढ़नी | Powerstar #Pawan Singh | #Shilpi Raj | Kala Odhani | New Bhojpuri Song", channel:"Pawan Singh & Shilpi Raj", dur:"4:00"},
+  {id:"H9z7upd8jf4", title:"Power Star Pawan Singh - Latest Official Song 2024 | Piya Chhod Dihin Na Ft. Aastha Singh T-Series", channel:"Pawan Singh", dur:"3:50"},
+  {id:"B6h-kQLQqec", title:"Sarrainodu (4K ULTRA HD) Full Hindi Dubbed Movie | Allu Arjun, Rakul Preet Singh, Catherine Tresa", channel:"Allu Arjun", dur:"2:15:00"},
+  {id:"Oz9SGhW9MUs", title:"Yevadu (4K ULTRA HD) Blockbuster Hindi Dubbed Movie | Ram Charan, Allu Arjun, Shruti Hassan", channel:"Ram Charan & Allu Arjun", dur:"2:20:00"},
+  {id:"FhGPD3jML6w", title:"Gold Thief (HD) - South Superhit Comedy Hindi Dubbed Movie l Allari Naresh, Pooja Jhaveri", channel:"Allari Naresh", dur:"2:05:00"},
+  {id:"BddP6PYo2gs", title:"Kesariya - Brahmāstra | Ranbir Kapoor | Alia Bhatt | Pritam | Arijit Singh | Amitabh Bhattacharya | 4K", channel:"Arijit Singh", dur:"4:29"},
+  {id:"RKioDWlajvo", title:"Lehanga", channel:"Jass Manak", dur:"3:32"},
+  {id:"x6Q7c9RyMzk", title:"Rowdy Baby (from Maari 2)", channel:"Dhanush & Sai Pallavi", dur:"3:50"},
+  {id:"BBAyRBTfsOU", title:"Vaaste", channel:"Dhvani Bhanushali", dur:"4:03"},
+  {id:"YpkJO_GrCo0", title:"Laung Laachi (Title Track)", channel:"Ammy Virk & Neeru Bajwa", dur:"3:15"},
+  {id:"hjWf8A0YNSE", title:"High Rated Gabru", channel:"Guru Randhawa", dur:"3:33"},
+];
+
+const redeemItems = [
+  {icon:"📱", name:"Mobile Recharge ₹10 (demo)", cost:200},
+  {icon:"🎁", name:"Demo Gift Voucher ₹50", cost:900},
+  {icon:"🎨", name:"App Theme Unlock", cost:100},
+  {icon:"⭐", name:"Profile Badge: Star Earner", cost:50},
+];
+
+function makeCode(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s="";
+  for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return "CR-"+s;
+}
+
+/* ==================== AD LOADING (LAZY + FIXED) ==================== */
+let adCounter = 0;
+
+function loadAd(container) {
+  if (container.dataset.loaded === "1") return;
+  container.dataset.loaded = "1";
+  adCounter++;
+
+  // Clear
+  container.innerHTML = "";
+
+  // Create unique id for this instance
+  const uid = "ad_" + adCounter + "_" + Date.now();
+
+  // atOptions
+  const s1 = document.createElement("script");
+  s1.type = "text/javascript";
+  s1.textContent = `
+    window.atOptions = {
+      key: "bd01fbf8c57dfec8eaf418c7b90ff9f8",
+      format: "iframe",
+      height: 50,
+      width: 320,
+      params: {}
+    };
+  `;
+  container.appendChild(s1);
+
+  // invoke.js
+  const s2 = document.createElement("script");
+  s2.type = "text/javascript";
+  s2.src = "https://www.highperformanceformat.com/bd01fbf8c57dfec8eaf418c7b90ff9f8/invoke.js";
+  s2.async = true;
+  s2.onerror = function() {
+    container.innerHTML = '<div style="font-size:11px;color:#999;padding:8px;">Ad failed to load</div>';
+  };
+  container.appendChild(s2);
+}
+
+/* IntersectionObserver for lazy ads */
+const adObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      loadAd(entry.target);
+      adObserver.unobserve(entry.target);
+    }
+  });
+}, {
+  root: document.querySelector('.tabs'),
+  rootMargin: "100px",
+  threshold: 0.1
+});
+
+function observeAds(parent) {
+  parent.querySelectorAll("[data-ad-container]").forEach(el => {
+    if (!el.dataset.loaded) {
+      adObserver.observe(el);
+    }
+  });
+}
+
+/* ==================== FEED ==================== */
+let searchQuery = "";
+let feedMode = "feed";
+let feedQueue = [];
+let feedObserver = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function nextBatch(n){
+  while(feedQueue.length < n){
+    feedQueue = feedQueue.concat(shuffle(videoPool));
+  }
+  return feedQueue.splice(0, n);
+}
+
+function videoCardHTML(v){
+  return `
+    <div class="video-card">
+      <div class="video-frame-wrap">
+        <span class="duration-badge">${v.dur}</span>
+        <iframe src="https://www.youtube.com/embed/\( {v.id}" title=" \){v.title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="video-meta">
+        <p class="video-title">${v.title}</p>
+        <div class="video-avatar-row">
+          <div class="video-avatar"></div>
+          <span class="video-sub">${v.channel}</span>
+        </div>
+        <div class="video-ad-wrap" data-ad-container></div>
+      </div>
+    </div>
+  `;
+}
+
+function appendFeedBatch(n){
+  const batch = nextBatch(n);
+  const list = document.getElementById('videoList');
+  const frag = document.createDocumentFragment();
+  const temp = document.createElement('div');
+  temp.innerHTML = batch.map(videoCardHTML).join('');
+  while(temp.firstChild){
+    frag.appendChild(temp.firstChild);
+  }
+  list.appendChild(frag);
+  observeAds(list);
+}
+
+function initHomeFeed(){
+  feedMode = "feed";
+  feedQueue = [];
+  document.getElementById('videoList').innerHTML = '';
+  appendFeedBatch(6);
+  setupInfiniteScroll();
+}
+
+function setupInfiniteScroll(){
+  const sentinel = document.getElementById('feedSentinel');
+  if(!sentinel) return;
+  if(feedObserver) feedObserver.disconnect();
+  feedObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && feedMode === "feed"){
+        appendFeedBatch(4);
+      }
+    });
+  }, { root: document.querySelector('.tabs'), rootMargin: '300px' });
+  feedObserver.observe(sentinel);
+}
+
+function renderSearchResults(){
+  feedMode = "search";
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = videoPool.filter(v => v.title.toLowerCase().includes(q) || v.channel.toLowerCase().includes(q));
+  const list = document.getElementById('videoList');
+
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="no-results"><div class="no-results-icon">🔍</div><p>No matching videos.</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(videoCardHTML).join('');
+  observeAds(list);
+}
+
+function filterVideos(){
+  searchQuery = document.getElementById('searchInput').value;
+  if(searchQuery.trim()){
+    renderSearchResults();
+  } else {
+    initHomeFeed();
+  }
+}
+
+function selectCategory(cat, evt){
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  evt.currentTarget.classList.add('active');
+
+  if(cat === 'music'){
+    feedMode = 'search';
+    const list = document.getElementById('videoList');
+    list.innerHTML = videoPool.map(videoCardHTML).join('');
+    observeAds(list);
+    showToast('Showing music videos');
+  } else {
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    initHomeFeed();
+    if(cat !== 'featured') showToast('Showing Featured feed');
+  }
+}
+
+/* ==================== REST OF APP ==================== */
+function renderStreak(){
+  const row = document.getElementById('streakRow');
+  const todayIndex = state.streak.findIndex(d=>!d);
+  row.innerHTML = state.streak.map((filled,i)=>{
+    const isToday = i===todayIndex;
+    return `<div class="streak-dot ${filled?'filled':''} \( {isToday?'today':''}">D \){i+1}</div>`;
+  }).join('');
+  const btn = document.getElementById('checkinBtn');
+  if(todayIndex === -1){
+    btn.disabled = true;
+    btn.textContent = "All 7 days claimed — streak complete!";
+  } else if(state.checkedInToday){
+    btn.disabled = true;
+    btn.textContent = "Come back tomorrow";
+  } else {
+    btn.disabled = false;
+    btn.textContent = "Claim today's coins";
+  }
+}
+
+function claimCheckin(evt){
+  const idx = state.streak.findIndex(d=>!d);
+  if(idx===-1 || state.checkedInToday) return;
+  state.streak[idx] = true;
+  state.checkedInToday = true;
+  awardCoins(15, evt.currentTarget);
+  showToast('Checked in! +15 🪙');
+  renderStreak();
+}
+
+const wheelValues = [10,20,5,50,15,0,30,25];
+function spinWheel(evt){
+  if(state.spinning) return;
+  state.spinning = true;
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true;
+  const targetIndex = Math.floor(Math.random()*wheelValues.length);
+  const reward = wheelValues[targetIndex];
+  const segAngle = 360/wheelValues.length;
+  const extraSpins = 360*5;
+  const targetCenter = targetIndex*segAngle + segAngle/2;
+  const rotation = extraSpins + (360 - targetCenter);
+  document.getElementById('wheel').style.transform = `rotate(${rotation}deg)`;
+
+  setTimeout(()=>{
+    if(reward>0){
+      awardCoins(reward, evt.currentTarget);
+      showToast(`🎉 You won ${reward} coins!`);
+    } else {
+      showToast(`No luck this spin — try again!`);
+    }
+    btn.disabled = false;
+    state.spinning = false;
+  }, 3300);
+}
+
+function startAdWatch(evt){
+  if(state.adRunning) return;
+  state.adRunning = true;
+  const btn = document.getElementById('adBtn');
+  const timerEl = document.getElementById('adTimer');
+  const fill = document.getElementById('adBarFill');
+  btn.disabled = true;
+  btn.textContent = "Watching...";
+  let secondsLeft = 15;
+  timerEl.textContent = secondsLeft+'s';
+  const total = secondsLeft;
+  const iv = setInterval(()=>{
+    secondsLeft -= 1;
+    timerEl.textContent = Math.max(secondsLeft,0)+'s';
+    fill.style.width = ((total-secondsLeft)/total*100)+'%';
+    if(secondsLeft<=0){
+      clearInterval(iv);
+      awardCoins(8, evt.currentTarget);
+      showToast('Demo ad complete · +8 🪙');
+      btn.textContent = "Watch demo ad";
+      btn.disabled = false;
+      state.adRunning = false;
+      setTimeout(()=>{ fill.style.width='0%'; timerEl.textContent='15s'; }, 900);
+    }
+  }, 1000);
+}
+
+function copyReferral(){
+  navigator.clipboard?.writeText(state.referralCode).then(()=>{
+    showToast('Referral code copied!');
+  }).catch(()=>{
+    showToast('Code: '+state.referralCode);
+  });
+}
+
+function renderRedeem(){
+  const grid = document.getElementById('redeemGrid');
+  grid.innerHTML = redeemItems.map((item,i)=>`
+    <div class="redeem-card" onclick="tryRedeem(${i})">
+      <div class="redeem-icon">${item.icon}</div>
+      <div class="redeem-name">${item.name}</div>
+      <div class="redeem-cost">${item.cost} 🪙</div>
+    </div>
+  `).join('');
+}
+
+function tryRedeem(i){
+  const item = redeemItems[i];
+  if(state.coins < item.cost){
+    showToast(`Need ${item.cost - state.coins} more coins`);
+    return;
+  }
+  state.coins -= item.cost;
+  updateCoinDisplays();
+  openModal('🎉', 'Redeemed!', `"${item.name}" redeemed for ${item.cost} coins. This is a demo.`);
+}
+
+function updateCoinDisplays(){
+  document.getElementById('coinBalance').textContent = state.coins;
+  document.getElementById('walletBalance').textContent = state.coins;
+}
+
+function awardCoins(amount, sourceEl){
+  state.coins += amount;
+  updateCoinDisplays();
+  flyCoin(sourceEl, amount);
+}
+
+function flyCoin(sourceEl, amount){
+  if(!sourceEl) return;
+  const target = document.getElementById('walletChip');
+  const srcRect = sourceEl.getBoundingClientRect();
+  const tgtRect = target.getBoundingClientRect();
+  const fly = document.createElement('div');
+  fly.className = 'coin-fly';
+  fly.textContent = '+'+amount+' 🪙';
+  fly.style.left = srcRect.left + srcRect.width/2 + 'px';
+  fly.style.top = srcRect.top + 'px';
+  document.body.appendChild(fly);
+  requestAnimationFrame(()=>{
+    fly.style.transform = `translate(${tgtRect.left - srcRect.left}px, ${tgtRect.top - srcRect.top}px) scale(.6)`;
+    fly.style.opacity = '0';
+  });
+  setTimeout(()=>fly.remove(), 1100);
+}
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function openModal(icon, title, body){
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+}
+
+function init(){
+  initHomeFeed();
+  renderStreak();
+  renderRedeem();
+  updateCoinDisplays();
+  document.getElementById('referCode').textContent = state.referralCode;
+  document.getElementById('friendCount').textContent = state.friendsReferred;
+}
+init();
+</script>
+</body>
+        </html>
